@@ -13,9 +13,9 @@ urlRouter.get("/custom", (req, res) => {
   res.send("Custom short URL created successfully");
 });
 
-urlRouter.get("/:shortUrl", (req, res) => {
-  res.send(": shortURL route");
-});
+// urlRouter.get("/:shortUrl", (req, res) => {
+//   res.send(": shortURL route");
+// });
 
 urlRouter.put("/:shortUrl", (req, res) => {
   res.send("Short URL updated successfully");
