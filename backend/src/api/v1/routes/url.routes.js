@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { shortenUrl } from "../controllers/url.controller.js";
 
 const urlRouter = Router();
 
@@ -6,9 +7,7 @@ urlRouter.get("/", (req, res) => {
   res.send("URL routes are working!");
 });
 
-urlRouter.post("/shorten", (req, res) => {
-  res.send("Shortened URL");
-});
+urlRouter.post("/shorten", shortenUrl);
 
 urlRouter.get("/custom", (req, res) => {
   res.send("Custom short URL created successfully");
