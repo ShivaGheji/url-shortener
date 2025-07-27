@@ -29,7 +29,7 @@ export const signUp = async (req, res, next) => {
     ]);
     // console.log("it's here");
 
-    const token = await jwt.sign({ userId: newUser[0]._id }, JWT_SECRET, {
+    const token = jwt.sign({ userId: newUser[0]._id }, JWT_SECRET, {
       expiresIn: JWT_EXPIRES_IN,
     });
 
