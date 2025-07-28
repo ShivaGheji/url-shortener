@@ -21,7 +21,6 @@ export const registerUser = async ({ name, email, password }) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = new User({ name, email, password: hashedPassword });
-    console.log("new user is - ", newUser);
     //   await newUser.save({ session });
     await newUser.save(); // for local development
 
