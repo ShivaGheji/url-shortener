@@ -28,14 +28,6 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// mongoose method to hide some details by default
-userSchema.methods.toJSON = function () {
-  const user = this.toObject();
-  delete user.password;
-  delete user.__v;
-  return user;
-};
-
 const User = mongoose.model("User", userSchema);
 
 export default User;
