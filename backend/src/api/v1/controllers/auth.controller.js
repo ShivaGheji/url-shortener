@@ -1,4 +1,6 @@
 import { registerUser } from "../services/auth.servise.js";
+import User from "../models/user.model.js";
+import bcrypt from "bcryptjs";
 
 export const signUp = async (req, res, next) => {
   try {
@@ -14,8 +16,16 @@ export const signUp = async (req, res, next) => {
   }
 };
 
-export const signIn = (req, res) => {
-  res.send("User logged in successfully");
+export const signIn = async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user || !(await user.comparePassword(password)))
+    return res.status(401).json({ message: "Invalid credentials" });
+
+  const token = createToken(user._id);
+  res.cookie("token", token, { httpOnly: true, secure: true });
+  res.json({ message: "Logged in", userId: user._id });
 };
 
 export const signOut = (req, res) => {
