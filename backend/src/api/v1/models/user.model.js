@@ -43,7 +43,6 @@ userSchema.methods.toJSON = function () {
 userSchema.methods.comparePassword = async function (candidatePwd) {
   return await bcrypt.compare(candidatePwd, this.password);
 };
-
 const User = mongoose.model("User", userSchema);
 
 export default User;
