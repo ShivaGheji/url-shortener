@@ -1,4 +1,4 @@
-import { registerUser } from "../services/auth.servise.js";
+import { registerUser, checkUser } from "../services/auth.servise.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 
@@ -16,16 +16,21 @@ export const signUp = async (req, res, next) => {
   }
 };
 
-export const signIn = async (req, res) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email });
+export const signIn = async (req, res, next) => {
+  try {
+    const { token, user } = await checkUser(req.body);
 
-  if (!user || !(await user.comparePassword(password)))
-    return res.status(401).json({ message: "Invalid credentials" });
-
-  const token = createToken(user._id);
-  res.cookie("token", token, { httpOnly: true, secure: true });
-  res.json({ message: "Logged in", userId: user._id });
+    res.status(200).json({
+      success: true,
+      message: "User signed in successfully",
+      data: {
+        token,
+        user,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const signOut = (req, res) => {
