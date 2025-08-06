@@ -21,29 +21,10 @@ const urlSchema = new mongoose.Schema(
       ref: "User",
       default: null, // null for anonymous user
     },
-    clicks: {
+    clickCount: {
       type: Number,
       default: 0,
     },
-    visits: [
-      {
-        ip: String,
-        userAgent: String,
-        timestamp: {
-          type: Date,
-          default: Date.now,
-        },
-        location: {
-          city: String,
-          country: String,
-          region: String,
-        },
-        locationResolved: {
-          type: Boolean,
-          default: false,
-        },
-      },
-    ],
     isDeleted: {
       type: Boolean,
       default: false,
