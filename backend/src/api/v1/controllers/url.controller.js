@@ -1,6 +1,4 @@
-import validator from "validator";
 import { status } from "http-status";
-import { sanitizeUrl } from "../../../utils/urlValidation.js";
 
 import { BASE_URL } from "../../../config/env.js";
 import {
@@ -8,36 +6,12 @@ import {
   getOriginalUrlService,
 } from "../services/url.services.js";
 
-export const shortenUrl = async (req, res) => {
-  if (!req.body?.originalUrl) {
-    return res.status(status.BAD_REQUEST).json({
-      success: false,
-      message: "Original URL is required",
-    });
-  }
-
-  const { originalUrl } = req.body;
-
-  const sanitizedUrl = sanitizeUrl(originalUrl);
-  if (!sanitizedUrl) {
-    return res.status(status.BAD_REQUEST).json({
-      success: false,
-      message: "Invalid URL format",
-    });
-  }
-
+export const shortenUrl = async (req, res, next) => {
   try {
-    const shortId = await createShortUrlService(
-      sanitizeUrl,
-      req.user ? req.user._id : null
+    const { shortId, sanitizedUrl } = await createShortUrlService(
+      req.body?.originalUrl,
+      req.user?._id || null
     );
-
-    if (!shortId) {
-      return res.status(status.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: "Failed to create short URL",
-      });
-    }
 
     return res.status(status.CREATED).json({
       success: true,
@@ -48,11 +22,7 @@ export const shortenUrl = async (req, res) => {
       },
     });
   } catch (error) {
-    return res.status(status.INTERNAL_SERVER_ERROR).json({
-      success: false,
-      message: "Server error",
-      error: error.message,
-    });
+    next(error);
   }
 };
 

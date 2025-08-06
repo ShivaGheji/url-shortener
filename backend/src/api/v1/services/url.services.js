@@ -1,8 +1,24 @@
 import urlModel from "../models/url.model.js";
 import { generateShortId } from "../../../utils/generateShortId.js";
 import { status } from "http-status";
+import { sanitizeUrl } from "../../../utils/urlValidation.js";
 
 export const createShortUrlService = async (originalUrl, userId) => {
+  if (!originalUrl) {
+    const error = new Error("Original URL is required");
+    error.statusCode = status.BAD_REQUEST;
+    throw error;
+  }
+
+  const sanitizedUrl = sanitizeUrl(originalUrl);
+  console.log(`sanitized URL is = ${sanitizedUrl}`);
+
+  if (!sanitizedUrl) {
+    const error = new Error("Invalid URL format");
+    error.statusCode = status.BAD_REQUEST;
+    throw error;
+  }
+
   let shortId;
   let existingShortId;
 
@@ -19,7 +35,7 @@ export const createShortUrlService = async (originalUrl, userId) => {
 
   await newUrl.save();
 
-  return shortId;
+  return { shortId, sanitizedUrl };
 };
 
 export const getOriginalUrlService = async (shortId, ip, userAgent) => {
