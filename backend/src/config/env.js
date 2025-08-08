@@ -9,4 +9,5 @@ export const {
   BASE_URL,
   JWT_SECRET,
   JWT_EXPIRES_IN,
+  TEMP_IP,
 } = process.env;

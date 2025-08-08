@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const clickSchema = new mongoose.Schema(
+const visitSchema = new mongoose.Schema(
   {
     urlId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -12,16 +12,13 @@ const clickSchema = new mongoose.Schema(
       ref: "User",
       default: null, // null for anonymous
     },
-    timestamp: {
-      type: Date,
-      default: Date.now,
-    },
     ipAddress: String,
     userAgent: String,
     deviceType: String, // mobile, tablet, desktop
     browser: String,
     os: String,
     referer: String,
+    timezone: String,
     location: {
       country: String,
       city: String,
@@ -37,4 +34,4 @@ const clickSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("Click", clickSchema);
+export default mongoose.model("Visit", visitSchema);

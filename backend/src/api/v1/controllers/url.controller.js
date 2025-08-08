@@ -5,6 +5,10 @@ import {
   createShortUrlService,
   getOriginalUrlService,
 } from "../services/url.services.js";
+import getVisitorDetails from "../middlewares/visitorLogger.middleware.js";
+
+// temp -  later move this
+import visitModel from "../models/visit.model.js";
 
 export const shortenUrl = async (req, res, next) => {
   try {
@@ -26,29 +30,28 @@ export const shortenUrl = async (req, res, next) => {
   }
 };
 
-export const redirectToOriginalUrl = async (req, res) => {
-  if (!req.params?.shortcode) {
-    return res.status(status.BAD_REQUEST).json({
-      success: false,
-      message: "Short URL is required",
-    });
-  }
-
+export const redirectToOriginalUrl = async (req, res, next) => {
   try {
-    const ip = req.ip || req.headers["x-forwarded-for"];
-    const userAgent = req.headers["user-agent"] || null;
-
-    const originalUrl = await getOriginalUrlService(
-      req.params.shortcode,
-      ip,
-      userAgent
+    const { urlId, originalUrl, createdBy } = await getOriginalUrlService(
+      req.params?.shortcode
     );
 
-    return res.redirect(originalUrl);
-  } catch (error) {
-    return res.status(status.INTERNAL_SERVER_ERROR).json({
-      success: false,
-      error: error.message,
+    const visitor = getVisitorDetails(req);
+
+    const visitData = new visitModel({
+      urlId,
+      userId: createdBy,
+      ...visitor,
     });
+
+    await visitData.save();
+
+    res.setHeader(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, proxy-revalidate"
+    );
+    res.redirect(302, originalUrl); // or 307 if needed
+  } catch (error) {
+    next(error);
   }
 };

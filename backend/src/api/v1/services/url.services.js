@@ -4,14 +4,15 @@ import { status } from "http-status";
 import { sanitizeUrl } from "../../../utils/urlValidation.js";
 
 export const createShortUrlService = async (originalUrl, userId) => {
+  // check original url exists or not
   if (!originalUrl) {
     const error = new Error("Original URL is required");
     error.statusCode = status.BAD_REQUEST;
     throw error;
   }
 
+  // Check valid URL
   const sanitizedUrl = sanitizeUrl(originalUrl);
-  console.log(`sanitized URL is = ${sanitizedUrl}`);
 
   if (!sanitizedUrl) {
     const error = new Error("Invalid URL format");
@@ -22,6 +23,7 @@ export const createShortUrlService = async (originalUrl, userId) => {
   let shortId;
   let existingShortId;
 
+  // if short id exists then regenerate new short id
   do {
     shortId = generateShortId();
     existingShortId = await urlModel.findOne({ shortId });
@@ -38,7 +40,13 @@ export const createShortUrlService = async (originalUrl, userId) => {
   return { shortId, sanitizedUrl };
 };
 
-export const getOriginalUrlService = async (shortId, ip, userAgent) => {
+export const getOriginalUrlService = async (shortId) => {
+  if (!shortId) {
+    const error = new Error("Short URL is required");
+    error.statusCode = status.BAD_REQUEST;
+    throw error;
+  }
+
   const urlData = await urlModel.findOne({ shortId });
 
   if (!urlData) {
@@ -47,15 +55,13 @@ export const getOriginalUrlService = async (shortId, ip, userAgent) => {
     throw error;
   }
 
-  const timestamp = new Date();
-
   urlData.clicks += 1;
-  urlData.visits.push({
-    ip,
-    userAgent,
-    timestamp,
-  });
   await urlData.save();
 
-  return urlData.originalUrl;
+  return {
+    urlId: urlData._id,
+    originalUrl: urlData.originalUrl,
+    // createdBy: urlData.createdBy || "Unknown",
+    createdBy: urlData.createdBy,
+  };
 };
