@@ -50,7 +50,7 @@ export const redirectToOriginalUrl = async (req, res, next) => {
       "Cache-Control",
       "no-store, no-cache, must-revalidate, proxy-revalidate"
     );
-    res.redirect(302, originalUrl); // or 307 if needed
+    res.redirect(302, originalUrl);
   } catch (error) {
     next(error);
   }

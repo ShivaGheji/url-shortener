@@ -12,6 +12,7 @@ const getVisitorDetails = (req) => {
   const parser = new UAParser(ua);
   const uaResult = parser.getResult();
 
+  // Handle localhost and temporary IPs
   if (ip === "::1" || ip.startsWith("::ffff:")) {
     ip = TEMP_IP;
   }
