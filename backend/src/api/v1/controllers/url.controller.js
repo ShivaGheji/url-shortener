@@ -14,7 +14,8 @@ export const shortenUrl = async (req, res, next) => {
   try {
     const { shortId, sanitizedUrl } = await createShortUrlService(
       req.body?.originalUrl,
-      req.user?._id || null
+      req.user?._id || null,
+      req.user ? undefined : req.clientMeta
     );
 
     return res.status(status.CREATED).json({

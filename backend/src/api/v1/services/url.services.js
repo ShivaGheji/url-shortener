@@ -3,7 +3,11 @@ import { generateShortId } from "../../../utils/generateShortId.js";
 import { status } from "http-status";
 import { sanitizeUrl } from "../../../utils/urlValidation.js";
 
-export const createShortUrlService = async (originalUrl, userId) => {
+export const createShortUrlService = async (
+  originalUrl,
+  userId,
+  clientMeta
+) => {
   // check original url exists or not
   if (!originalUrl) {
     const error = new Error("Original URL is required");
@@ -33,6 +37,7 @@ export const createShortUrlService = async (originalUrl, userId) => {
     originalUrl,
     shortId,
     createdBy: userId || null,
+    clientMeta,
   });
 
   await newUrl.save();
@@ -55,7 +60,7 @@ export const getOriginalUrlService = async (shortId) => {
     throw error;
   }
 
-  urlData.clicks += 1;
+  urlData.clickCount += 1;
   await urlData.save();
 
   return {

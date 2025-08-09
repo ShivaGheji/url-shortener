@@ -61,7 +61,7 @@ export const checkUser = async ({ email, password }) => {
     throw error;
   }
 
-  const token = jwt.sign({ userID: user._id }, JWT_SECRET, {
+  const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
     expiresIn: JWT_EXPIRES_IN,
   });
 

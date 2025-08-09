@@ -21,6 +21,10 @@ const urlSchema = new mongoose.Schema(
       ref: "User",
       default: null, // null for anonymous user
     },
+    clientMeta: {
+      ip: String,
+      // userAgent: String,
+    },
     clickCount: {
       type: Number,
       default: 0,
