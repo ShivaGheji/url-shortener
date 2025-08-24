@@ -1,6 +1,5 @@
 import validator from "validator";
 import { URL } from "url";
-import { status } from "http-status";
 
 function normalizeUrl(url) {
   if (!/^https?:\/\//i.test(url)) {
@@ -39,13 +38,13 @@ export const sanitizeUrl = (inputUrl) => {
 
   if (!isSafe) {
     const error = new Error("Invalid or unsupported URL");
-    error.statusCode = status.BAD_REQUEST;
+    error.statusCode = 400;
     throw error;
   }
 
   if (isBlockedDomain(normalized)) {
     const error = new Error("Blocked or private domain");
-    error.statusCode = status.FORBIDDEN;
+    error.statusCode = 403;
     throw error;
   }
 
