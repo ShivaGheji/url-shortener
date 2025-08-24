@@ -1,5 +1,3 @@
-import { status } from "http-status";
-
 import { BASE_URL } from "../../../config/env.js";
 import {
   createShortUrlService,
@@ -18,7 +16,7 @@ export const shortenUrl = async (req, res, next) => {
       req.user ? undefined : req.clientMeta
     );
 
-    return res.status(status.CREATED).json({
+    return res.status(201).json({
       success: true,
       message: "URL shortened successfully",
       data: {
