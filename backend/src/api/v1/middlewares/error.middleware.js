@@ -1,35 +1,53 @@
+import { ZodError } from "zod";
+
 const errorMiddleware = (err, req, res, next) => {
   try {
-    let error = { ...err };
+    // Default values
+    let statusCode = err.statusCode || 500;
+    let message = err.message || "Server Error";
+    let errors = [];
 
-    error.message = err.message;
-
-    // console.log(err);
-
-    // mongoose bad ObjectID
-    if (err.name === "CastError") {
-      const message = "Resource not found";
-      error = new Error(message);
-      error.statusCode = 404;
+    // Handle Zod validation errors
+    if (err instanceof ZodError) {
+      statusCode = 400;
+      message = "Validation failed";
+      errors = err.issues.map((e) => ({
+        field: e.path.join(".") || null,
+        message: e.message,
+      }));
     }
 
-    // Mongoose duplicate key
-    if (err.code === 11000) {
-      const message = "Duplicate field value entered";
-      error = new Error(message);
-      error.statusCode = 400;
+    // Handle Mongoose CastError (invalid ObjectId)
+    else if (err.name === "CastError") {
+      statusCode = 404;
+      message = "Resource not found";
     }
 
-    // mongoose validation error
-    if (err.name === "ValidationError") {
-      const message = Object.values(err.errors).map((val) => val.message);
-      error = new Error(message.join(", "));
-      error.statusCode = 422;
+    // Handle Mongoose duplicate key
+    else if (err.code === 11000) {
+      statusCode = 400;
+      message = "Duplicate field value entered";
+      errors = Object.keys(err.keyValue || {}).map((field) => ({
+        field,
+        message: `Duplicate value for ${field}`,
+      }));
     }
 
-    res
-      .status(error.statusCode || 500)
-      .json({ success: false, error: error.message || "Server Error" });
+    // Handle Mongoose ValidationError
+    else if (err.name === "ValidationError") {
+      statusCode = 422;
+      message = "Validation failed";
+      errors = Object.values(err.errors).map((val) => ({
+        field: val.path,
+        message: val.message,
+      }));
+    }
+
+    res.status(statusCode).json({
+      success: false,
+      message,
+      ...(errors.length > 0 && { errors }),
+    });
   } catch (error) {
     next(error);
   }
