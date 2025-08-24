@@ -10,4 +10,7 @@ export const {
   JWT_SECRET,
   JWT_EXPIRES_IN,
   TEMP_IP,
+  COOKIE_NAME,
+  CSRF_COOKIE_NAME,
+  CSRF_HEADER_NAME,
 } = process.env;
